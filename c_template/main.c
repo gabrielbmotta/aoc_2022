@@ -12,6 +12,7 @@ int main(int argc, char* argv[])
         while(!feof(fp) && fscanf(fp, "%c %c\n", &buff[0], &buff[1])){
             printf("%c, %c\n", buff[0], buff[1]);
         }
+        fclose(fp);
         return 0; 
     }
 
