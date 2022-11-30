@@ -16,3 +16,7 @@ For example,
 ### Templates
 
 I've added some simple reading-from-file examples  in a few languages. These can be copied to start a solution. They prioritize simplicity over felxibility, so some aspects, like the format/layout of the input file, is assumed. Please feel free to add more language templates.
+
+### License
+
+Please add your name to the copyright portion of the MIT License file if you contribute to this repository.
