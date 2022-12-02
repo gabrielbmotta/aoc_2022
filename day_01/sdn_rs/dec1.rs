@@ -1,4 +1,5 @@
 use std::str;
+use std::collections::BinaryHeap;
 
 /*
  * Could I build a heap? Yes
@@ -6,33 +7,31 @@ use std::str;
  * Is there a faster way than just doing it by hand? No
  * Ergo I choose to just ignore the first max I found, then the second, and record the answers down
  */
-fn solve(ignore1: u32, ignore2: u32, input: &str) {
-    let mut max = 0u32;
+fn solve(input: &str) {
+    let mut max = BinaryHeap::<u32>::new();
     let mut cur = 0u32;
 
     for line in input.split_terminator('\n') {
         if line.is_empty() {
-            if (cur > max) && (cur != ignore1) && (cur != ignore2) {
-                max = cur;
-            }
+            max.push(cur);
             cur = 0;
         }
         else {
-            let num: u32 = line.parse().expect("not a number");
+            let num = line.parse::<u32>().expect("not a number");
             cur += num;
         }
     }
-    if cur > max {
-        max = cur;
-    }
+    max.push(cur);
 
-    println!("{}", max);
+    println!("{}", max.peek().unwrap()); max.pop();
+    println!("{}", max.peek().unwrap()); max.pop();
+    println!("{}", max.peek().unwrap()); max.pop();
 }
 
 // I don't want to have to worry about dependencies or anything else,
 // so just pass input as a long string. Easy to copy, not so easy to read.
 fn main() {
-    solve(999999, 999999, "
+    solve("
 10062
 15651
 1271
