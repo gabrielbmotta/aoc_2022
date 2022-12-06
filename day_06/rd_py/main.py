@@ -9,20 +9,33 @@ if __name__ == '__main__':
     lines = read_lines(path)[0]
     nchar = 0
     marker = []
-    max_marker = 4
+    message = 14
+    package = 4
+    max_marker = 14
     n_total = 0
-
+    package_detected = False
     for i in range(len(lines)):
         # check next four char if same as current
         # if same, add to marker
         current = lines[i]
         marker.append(current)
         # past four chars
-        if len(marker) > max_marker:
-            past_four = lines[i-4:i]
-            if len(set(past_four)) == max_marker:
-                n_total = i 
-                break
+        if package_detected:
+            if len(marker) > (message + package):
+                past_fourteen = lines[i-message:i]
+                if len(set(past_fourteen)) == message:
+                    n_message = i 
+                    print(i)
+                    break
+        else:
+            if len(marker) > (package):
+                past_four = lines[i-package:i]
+                if len(set(past_four)) == package:
+                    n_total = i 
+                    package_detected = True
 
-    print("Marker: ", past_four)
-    print("Total: ", n_total)
+
+    print("Package: ", past_four)
+    print("Total package: ", n_total)
+    print("Message: ", past_fourteen)
+    print("Total message: ", n_message)
