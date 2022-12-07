@@ -1,4 +1,6 @@
 #include <cctype>
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -41,21 +43,21 @@ tree_node* create_tree_from_file(std::ifstream& input_file){
                             break;
                         }
                     }
-                    if(!found_node){
-                        auto*new_node = new tree_node;
-                        new_node->name = dirname;
-                        new_node->parent = current_node;
+                    // if(!found_node){
+                    //     auto*new_node = new tree_node;
+                    //     new_node->name = dirname;
+                    //     new_node->parent = current_node;
                         
-                        current_node->sub_nodes.insert(new_node);
-                        current_node = new_node;
-                    }
+                    //     current_node->sub_nodes.insert(new_node);
+                    //     current_node = new_node;
+                    // }
                 }
             } else if(temp[2] == 'l'){
                 bool output_done = false;
                 while(!output_done){
-                    std::cout << "parsing ouput\n";
+                    //std::cout << "parsing ouput\n";
                     auto next_char = input_file.peek();
-                    std::cout << (char)next_char << "\n";
+                    //std::cout << (char)next_char << "\n";
                     if(next_char == '$'){
                         output_done = true;
                         continue;
@@ -64,6 +66,8 @@ tree_node* create_tree_from_file(std::ifstream& input_file){
                         std::getline(input_file, ls_output);
 
                         if(std::isdigit(ls_output[0])){
+                            bool unique = true;
+
                             auto sp_index = ls_output.find(' ');
                             auto new_name = ls_output.substr(sp_index + 1);
 
@@ -79,6 +83,7 @@ tree_node* create_tree_from_file(std::ifstream& input_file){
                             auto*new_node = new tree_node;
                             new_node->name = new_name;
                             new_node->parent = current_node;
+                            //std::cout << new_name << "\n";
 
                             current_node->sub_nodes.insert(new_node);
                         } else {
@@ -86,7 +91,7 @@ tree_node* create_tree_from_file(std::ifstream& input_file){
                         }
                     }
                 }
-                std::cout << "done\n";
+                //std::cout << "done\n";
             }
         }
     }
@@ -106,7 +111,21 @@ uint calculate_node_size(tree_node* node){
     return node->size;
 }
 
-int size_of_large_dir(const char* infile, int size_min)
+void combinded_size_below(tree_node* root, uint threshold, int& sum)
+{
+    if(!root->sub_nodes.empty() && root->size < threshold){
+        sum += root->size;
+        //std::cout << root->name << " : " << root->size << "\n";
+        //std::cout << "ON -- " << root->name << "\n";
+    }
+
+    for(auto* node : root->sub_nodes){
+        //std::cout << node->name << "\n";
+        combinded_size_below(node, threshold, sum);
+    }
+}
+
+int size_of_dir(const char* infile, int threshold)
 {
     std::ifstream input_file(infile);
     if(!input_file.is_open()){
@@ -116,10 +135,48 @@ int size_of_large_dir(const char* infile, int size_min)
     auto* tree = create_tree_from_file(input_file);
 
     calculate_node_size(tree);
+
+    int sum = 0;
+
+    combinded_size_below(tree, threshold, sum);
     
+    return sum;
+}
+
+void smalleset_dir_larger_than(tree_node* root, int threshold, uint& value)
+{
+    if(!root->sub_nodes.empty() && root->size >= threshold && root->size < value){
+        value = root->size;
+        // std::cout << "ON -- " << root->name << "\n";
+    }
+
+    for(auto* node : root->sub_nodes){
+        // std::cout << node->name << "\n";
+        smalleset_dir_larger_than(node, threshold, value);
+    }
+}
+
+int smallest_dir_to_delete(const char* infile){
+    std::ifstream input_file(infile);
+    if(!input_file.is_open()){
+        return -1;
+    }
+
+    auto* tree = create_tree_from_file(input_file);
+
+    calculate_node_size(tree);
+
+    uint value = UINT32_MAX;
+
+    smalleset_dir_larger_than(tree, 30000000 - (70000000-tree->size), value);
+    
+    return value;
 }
 
 int main(int argc, char* argv[])
 {
-    std::cout << "Size of dirs above 100000:\t" << size_of_large_dir("input.txt", 100000) <<  "\n";
+    std::cout << "Size of dirs below 100000:\t" << size_of_dir("input.txt", 100000) <<  "\n";
+
+    std::cout << "Size of smallest dir to delete:\t" << smallest_dir_to_delete("input.txt") <<  "\n";
+    
 }
