@@ -1,48 +1,90 @@
-#include <iostream>
+#include <cmath>
 #include <fstream>
+#include <iostream>
+#include <set>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
-struct node{
-  bool visited = false;
-};
+typedef std::pair<int, int> pos;
 
-struct instr{
-  char dir;
+int distance(pos p1, pos p2) {
+  int dist =
+      sqrt(pow((p1.first - p2.first), 2) + pow((p1.second - p2.second), 2));
+  // std::cout << "d: " << dist << "\n";
+  return dist;
+}
+
+void move_head(pos &head, char direction) {
+  switch (direction) {
+  case 'R':
+    ++head.first;
+    break;
+  case 'L':
+    --head.first;
+    break;
+  case 'U':
+    ++head.second;
+    break;
+  case 'D':
+    --head.second;
+    break;
+  }
+}
+
+void move_tail(const pos &head, pos &tail, char direction) {
+  tail = head;
+  switch (direction) {
+  case 'R':
+    --tail.first;
+    break;
+  case 'L':
+    ++tail.first;
+    break;
+  case 'U':
+    --tail.second;
+    break;
+  case 'D':
+    ++tail.second;
+    break;
+  }
+}
+
+void traverse(const char *input_file_path) {
+  std::ifstream input_file(input_file_path);
+
+  pos head_pos{0, 0}, tail_pos{0, 0};
+
+  std::set<pos> tail_pos_tracker;
+
   int num;
-};
-
-int main(int argc, char* argv[])
-{
-  std::ifstream input_file("input.txt");
-
-  int num;
   char dir;
-  
-  std::vector<instr> directions;
-  int total = 0;
+  while (input_file >> dir >> num) {
+    for (int i = 0; i < num; ++i) {
+      std::cout << "[" << head_pos.first << "," << head_pos.second << " -- "
+                << tail_pos.first << "," << tail_pos.second << "]\n";
+      if (tail_pos_tracker.insert(tail_pos).second) {
+        //  std::cout << tail_pos.first << "," << tail_pos.second << "\n";
+      }
 
-  while(input_file >> dir >> num){
-    // std::cout << dir << " " << num << "\n";
-    directions.push_back({dir,num});
-    total += num;
+      move_head(head_pos, dir);
+
+      // std::cout << "POST-MOVE[" << head_pos.first << "," << head_pos.second
+      // << " " << tail_pos.first << "," << tail_pos.second << "]\n";
+      if (distance(head_pos, tail_pos) > 1) {
+        // std::cout << "MOVING\n";
+        move_tail(head_pos, tail_pos, dir);
+      }
+    }
+    tail_pos_tracker.insert(tail_pos);
   }
+  tail_pos_tracker.insert(tail_pos);
 
-  std::cout << total << "\n";
+  std::cout << "Num places visited: " << tail_pos_tracker.size() << "\n";
+}
 
-  std::vector<std::vector<node>> map;
-  int map_size = total * 2 + 1;
-  map.resize(map_size);
-  for(auto& element : map){
-    element.resize(map_size);
-  }
+int main(int argc, char *argv[]) {
+  traverse("input.txt");
 
-  int curr_x = total, curr_y = total;
-
-  for(auto& instruction : directions){
-    // do things here
-  }
-  
   return 0;
 }
