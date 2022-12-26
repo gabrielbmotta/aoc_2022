@@ -32,22 +32,19 @@ void move_head(pos &head, char direction) {
   }
 }
 
-void move_tail(const pos &head, pos &tail, char direction) {
-  tail = head;
-  switch (direction) {
-  case 'R':
-    --tail.first;
-    break;
-  case 'L':
+void move_tail(const pos &head, pos &tail) {
+  int x_diff = tail.first - head.first;
+  int y_diff = tail.second - head.second;
+
+  if (x_diff < 0)
     ++tail.first;
-    break;
-  case 'U':
-    --tail.second;
-    break;
-  case 'D':
+  else if (x_diff > 0)
+    --tail.first;
+
+  if (y_diff < 0)
     ++tail.second;
-    break;
-  }
+  else if (y_diff > 0)
+    --tail.second;
 }
 
 void traverse(const char *input_file_path) {
@@ -73,18 +70,54 @@ void traverse(const char *input_file_path) {
       // << " " << tail_pos.first << "," << tail_pos.second << "]\n";
       if (distance(head_pos, tail_pos) > 1) {
         // std::cout << "MOVING\n";
-        move_tail(head_pos, tail_pos, dir);
+        move_tail(head_pos, tail_pos);
       }
     }
     tail_pos_tracker.insert(tail_pos);
   }
   tail_pos_tracker.insert(tail_pos);
 
-  std::cout << "Num places visited: " << tail_pos_tracker.size() << "\n";
+  std::cout << "Num places visited by simple rope: " << tail_pos_tracker.size()
+            << "\n";
+}
+
+void traverse2(const char *input_file_path) {
+  std::ifstream input_file(input_file_path);
+
+  std::vector<pos> rope;
+  rope.resize(10);
+  for (auto &link : rope) {
+    link = {0, 0};
+  }
+
+  std::set<pos> tail_pos_tracker;
+
+  int num;
+  char dir;
+  while (input_file >> dir >> num) {
+    for (int i = 0; i < num; ++i) {
+      tail_pos_tracker.insert(rope.back());
+
+      move_head(rope.front(), dir);
+
+      for (int j = 1; j < rope.size(); ++j) {
+        if (distance(rope[j - 1], rope[j]) > 1) {
+          // std::cout << "MOVING\n";
+          move_tail(rope[j - 1], rope[j]);
+        }
+      }
+    }
+    tail_pos_tracker.insert(rope.back());
+  }
+  tail_pos_tracker.insert(rope.back());
+
+  std::cout << "Num places visited by 10 len rope: " << tail_pos_tracker.size()
+            << "\n";
 }
 
 int main(int argc, char *argv[]) {
   traverse("input.txt");
+  traverse2("input.txt");
 
   return 0;
 }
