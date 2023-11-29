@@ -6,13 +6,14 @@ programCounter = 0
 cycle = 1
 addend = 0
 answers = []
-op = "None"
+op = None
 line = ["." for x in range(40)]
 
 with open("C:\\Advent of Code\\aoc_2022\\day_10\\ae_py\\input.txt", "r") as f:
     inputLines = f.readlines()
+
 out = open("C:\\Advent of Code\\aoc_2022\\day_10\\ae_py\\out.txt", "w")
-#out.write("Cycle\tPhase\tRegister\tOp\t\tAddend\n")
+
 for x in range(240):
     #Beginning of cycle
     if phase == read:
@@ -22,15 +23,11 @@ for x in range(240):
             addend = int(instruction.split(" ")[1].strip())
         else:
             programCounter += 1
+
     #During cycle
-    if abs((cycle%40-1)-register) <=1:
+    if abs((cycle%40-1)-register) <=1: #Check if sprite intersects with drawn pixel
         line[(cycle%40)-1] = "#"
-        written="#"
-    else:
-        written="."
-    #out.write(f"Cycle: {cycle}, Position: {cycle%40-1}, Register: {register}, Written: {written}\n")
-    #out.write(f"{cycle}\t\t{phase}\t\t{register}\t\t\t{op}\t{addend}\n")
-    
+
     #End of cycle
     if phase == execute: # phase == execute
         programCounter += 1
@@ -41,8 +38,8 @@ for x in range(240):
         #Print row
         out.write("".join(line) + "\n")
         line = ["." for x in range(40)]
-        
-    cycle += 1
-    if op == "addx":
+
+    if op == "addx": #Only go to execute phase for addx op
         phase = (phase+1)%2
-print(sum(answers))
+    
+    cycle += 1
