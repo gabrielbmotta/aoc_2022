@@ -9,9 +9,9 @@ answers = []
 op = "None"
 line = ["." for x in range(40)]
 
-with open("C:\\Advent of Code\\aoc_2022\\day_10\\input.txt", "r") as f:
+with open("C:\\Advent of Code\\aoc_2022\\day_10\\ae_py\\input.txt", "r") as f:
     inputLines = f.readlines()
-out = open("C:\\Advent of Code\\aoc_2022\\day_10\\out.txt", "w")
+out = open("C:\\Advent of Code\\aoc_2022\\day_10\\ae_py\\out.txt", "w")
 #out.write("Cycle\tPhase\tRegister\tOp\t\tAddend\n")
 for x in range(240):
     #Beginning of cycle
